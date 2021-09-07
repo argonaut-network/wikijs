@@ -1,0 +1,60 @@
+version: "3"
+services:
+
+  db:
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_DB: wiki
+      POSTGRES_PASSWORD: wikijsrocks
+      POSTGRES_USER: wikijs
+    logging:
+      driver: "none"
+    restart: unless-stopped
+    volumes:
+      - /var/lib/wikijs/database:/var/lib/postgresql/data
+    networks:
+      - backend
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  wiki:
+    image: requarks/wiki:2
+    depends_on:
+      - db
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: wikijs
+      DB_PASS: wikijsrocks
+      DB_NAME: wiki
+    restart: unless-stopped
+    networks:
+      - proxy
+      - backend
+    labels:
+      - "traefik.enable=true"
+      
+      # Accept HTTP and upgrade to HTTPS
+      - "traefik.http.routers.kb.entrypoints=http"
+      - "traefik.http.routers.kb.rule=HostHeader(`kb.argonaut.network`)"
+      - "traefik.http.routers.kb.rule=Host(`kb.argonaut.network`)"
+      - "traefik.http.middlewares.kb-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.kb.middlewares=kb-https-redirect"
+      
+      # Define secure entry point
+      - "traefik.http.routers.kb-secure.entrypoints=https"
+      - "traefik.http.routers.kb-secure.rule=HostHeader(`kb.argonaut.network`)"
+      - "traefik.http.routers.kb-secure.rule=Host(`kb.argonaut.network`)"
+      - "traefik.http.routers.kb-secure.tls=true"
+      - "traefik.http.routers.kb-secure.tls.certresolver=http"
+      
+      # These next three labels seem to break things. Use with caution.
+      - "traefik.docker.network=proxy"
+      
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  proxy:
+    external: true
+  backend:
