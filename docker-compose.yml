@@ -1,37 +1,19 @@
 version: "3"
 services:
 
-  db:
-    image: postgres:11-alpine
-    environment:
-      POSTGRES_DB: wiki
-      POSTGRES_PASSWORD: wikijsrocks
-      POSTGRES_USER: wikijs
-    logging:
-      driver: "none"
-    restart: unless-stopped
-    volumes:
-      - /var/lib/wikijs/database:/var/lib/postgresql/data
-    networks:
-      - backend
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-
   wiki:
     image: requarks/wiki:2
-    depends_on:
-      - db
     environment:
       DB_TYPE: postgres
-      DB_HOST: db
+      DB_HOST: postgresql-primary
       DB_PORT: 5432
       DB_USER: wikijs
-      DB_PASS: wikijsrocks
-      DB_NAME: wiki
+      DB_PASS: $DB_PASS
+      DB_NAME: wikijs
     restart: unless-stopped
     networks:
       - proxy
-      - backend
+      - postgresql-primary-backend
     labels:
       - "traefik.enable=true"
       
@@ -57,4 +39,5 @@ services:
 networks:
   proxy:
     external: true
-  backend:
+  postgresql-primary-backend:
+    external: true
