@@ -31,7 +31,6 @@ services:
       - "traefik.http.routers.kb-secure.tls=true"
       - "traefik.http.routers.kb-secure.tls.certresolver=http"
       
-      # These next three labels seem to break things. Use with caution.
       - "traefik.docker.network=proxy"
       
       - "com.centurylinklabs.watchtower.enable=true"
