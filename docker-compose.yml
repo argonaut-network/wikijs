@@ -11,6 +11,8 @@ services:
       DB_USER: wikijs
       DB_PASS: $DB_PASS
       DB_NAME: wikijs
+    volumes:
+      - /etc/wikijs:/etc/wikijs
     networks:
       - proxy
       - postgresql-primary-backend
