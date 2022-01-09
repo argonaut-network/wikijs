@@ -3,6 +3,7 @@ services:
 
   wiki:
     image: requarks/wiki:2
+    restart: unless-stopped
     environment:
       DB_TYPE: postgres
       DB_HOST: postgresql-primary
@@ -10,7 +11,8 @@ services:
       DB_USER: wikijs
       DB_PASS: $DB_PASS
       DB_NAME: wikijs
-    restart: unless-stopped
+    volumes:
+      - /backups/wikijs:/backups/wikijs
     networks:
       - proxy
       - postgresql-primary-backend
