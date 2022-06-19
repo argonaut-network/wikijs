@@ -18,21 +18,9 @@ services:
       - postgresql-primary-backend
     labels:
       - "traefik.enable=true"
-      
-      # Accept HTTP and upgrade to HTTPS
-      - "traefik.http.routers.kb.entrypoints=http"
-      - "traefik.http.routers.kb.rule=HostHeader(`kb.argonaut.network`)"
-      - "traefik.http.routers.kb.rule=Host(`kb.argonaut.network`)"
-      - "traefik.http.middlewares.kb-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.kb.middlewares=kb-https-redirect"
-      
-      # Define secure entry point
       - "traefik.http.routers.kb-secure.entrypoints=https"
-      - "traefik.http.routers.kb-secure.rule=HostHeader(`kb.argonaut.network`)"
       - "traefik.http.routers.kb-secure.rule=Host(`kb.argonaut.network`)"
       - "traefik.http.routers.kb-secure.tls=true"
-      - "traefik.http.routers.kb-secure.tls.certresolver=http"
-      
       - "traefik.docker.network=proxy"
       
       - "com.centurylinklabs.watchtower.enable=true"
